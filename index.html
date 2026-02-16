@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valentine Surprise 💘</title>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+      transition: background 1s ease;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      transition: all 0.8s ease;
+      position: relative;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 10px 0 25px;
+      font-size: 1.1rem;
+    }
+
+    button {
+      padding: 12px 28px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .screen {
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .screen.hidden {
+      opacity: 0;
+      transform: scale(0.95);
+      position: absolute;
+      inset: 40px;
+    }
+
+    .btn-group {
+      position: relative;
+      margin-top: 20px;
+      height: 120px; /* space for NO button */
+    }
+
+    .yes {
+      background: #ff6b81;
+      color: #fff;
+    }
+
+    .no {
+      background: #57606f;
+      color: #fff;
+      position: absolute;
+      top: 70px;
+      left: 50%;
+    }
+
+    /* Floating hearts */
+    .hearts {
+      font-size: 1.8rem;
+      margin: 20px 0;
+      animation: float 2.5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+
+    .message {
+      margin-top: 20px;
+      font-size: 1rem;
+      line-height: 1.5;
+      white-space: pre-line;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .message.show {
+      opacity: 1;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="container">
+    <!-- 404 Screen -->
+    <div id="screen404" class="screen">
+      <h1>404</h1>
+      <p>Page Not Found 😅</p>
+      <button id="refreshBtn">Refresh</button>
+    </div>
+
+    <!-- Valentine Screen -->
+    <div id="screenValentine" class="screen hidden">
+      <h1>Iha Will you be my Valentine? 💖</h1>
+
+      <div class="hearts">❤️ 💖 💕 💗 💓</div>
+
+      <div class="btn-group">
+        <button class="yes" id="yesBtn">YES</button>
+        <button class="no" id="noBtn">NO</button>
+      </div>
+
+      <div class="message" id="message">
+By clicking YES you agree to:
+
+Unlimited Bakchodi
+Lifetime meri spelling correct karogi
+You have to be my valentine every year samjhiiiiii
+Effective immediately! 🚀
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screen404 = document.getElementById('screen404');
+    const screenValentine = document.getElementById('screenValentine');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const message = document.getElementById('message');
+
+    let yesScale = 1;
+
+    // Center NO button initially
+    noBtn.style.transform = 'translateX(-50%)';
+
+    refreshBtn.onclick = () => {
+      screen404.classList.add('hidden');
+      screenValentine.classList.remove('hidden');
+    };
+
+    yesBtn.onclick = () => {
+      message.classList.add('show');
+
+      setTimeout(() => {
+        yesBtn.classList.add('hidden');
+        noBtn.classList.add('hidden');
+      }, 1000);
+
+      startConfetti();
+    };
+
+    noBtn.onclick = () => {
+      // Switch to fixed positioning
+      noBtn.style.position = 'fixed';
+      noBtn.style.transform = 'none';
+
+      const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+      const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+
+      noBtn.style.left = x + 'px';
+      noBtn.style.top = y + 'px';
+
+      // Change background gradient
+      document.body.style.background = `linear-gradient(135deg,
+        hsl(${Math.random() * 360}, 70%, 80%),
+        hsl(${Math.random() * 360}, 70%, 75%))`;
+
+      // Grow YES button 😈
+      yesScale += 0.15;
+      yesBtn.style.transform = `scale(${yesScale})`;
+    };
+
+    /* Confetti */
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    function startConfetti() {
+      const pieces = Array.from({ length: 200 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 5 + 2,
+        color: `hsl(${Math.random() * 360},70%,60%)`
+      }));
+
+      const start = Date.now();
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          p.y += p.d;
+        });
+
+        if (Date.now() - start < 5000) {
+          requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      draw();
+    }
+
+    window.onresize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+  </script>
+</body>
+</html>
